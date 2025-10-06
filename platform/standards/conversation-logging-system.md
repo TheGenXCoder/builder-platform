@@ -258,6 +258,33 @@ Tags: #quality-standards #fact-verification #lessons-learned"
 - Current context status
 - Ready to continue or start fresh
 
+### Step 6: Compact After Logging (CRITICAL)
+
+**ONLY compact/start fresh AFTER logging is complete.**
+
+**The 20% trigger workflow:**
+1. Trigger hits at 20% remaining
+2. Complete logging process (Steps 1-5)
+3. Verify log is committed to git
+4. **THEN** compact/start new conversation
+
+**Why this order matters:**
+- Auto-compact at 0% = context loss before logging completes
+- 20% buffer ensures logging finishes before auto-compact triggers
+- Compacting after logging = total context preservation
+- All decisions, lessons, and work captured before reset
+
+**What to compact:**
+- Start fresh conversation
+- Previous context preserved in log file
+- Continue work with clean context window
+- Log is searchable/retrievable when needed
+
+**NEVER:**
+- Compact before logging completes
+- Risk context loss by deferring logging
+- Continue working when at/near 20% without logging first
+
 ---
 
 ## Data Loss Prevention
@@ -310,20 +337,129 @@ conversation-logs/
 - File naming conventions
 - Full-text search
 
-### Future State (Graph RAG)
+### Future State (Graph RAG) - Total Context Preservation
 
-**When graph database implemented:**
-- Logs become nodes in knowledge graph
-- Tags become relationships
-- Entities extracted (cars, specs, decisions, lessons)
-- Semantic search across all logs
-- Context retrieval based on topic/theme
+**The Vision: Platform Builds Itself Using Itself**
 
-**Preparation for future:**
-- Comprehensive tagging now
-- Consistent formatting
-- Entity-rich summaries
-- Cross-reference related logs
+The Builder Platform must eat its own dog food. Everything we create, learn, decide, and discover feeds back into the platform to make it better. This is total context preservation for continuous improvement.
+
+**What Gets Harvested:**
+- **Conversation logs** (decisions, lessons, teaching moments)
+- **System prompts** (what instructions work, what fails)
+- **Specifications** (research frameworks, quality standards, verification protocols)
+- **Chain-of-thought** (reasoning processes, problem-solving patterns)
+- **Research data** (Q50 drivetrain specs, competitor analysis, verified facts)
+- **Failures and corrections** (RS4 pricing mistake, auto-compact conflict)
+- **User feedback** (teaching moments, precision standards, philosophy)
+
+**Graph RAG Architecture:**
+
+**Nodes:**
+- Conversation logs (each session)
+- Research findings (each verified fact)
+- Decisions (platform choice, build path, standards)
+- Lessons learned (failures, corrections, improvements)
+- Specifications (cars, parts, processes)
+- Standards documents (quality, verification, writing)
+- User teachings (Collector Context Rule, 20% buffer, precision language)
+
+**Relationships:**
+- Tags link related concepts (#quality-standards, #VR30, #fact-verification)
+- Entities connect across logs (Q50, RS4, S7, DCT, manual transmission)
+- Temporal links (decision → outcome, lesson → protocol)
+- Causality (failure → correction → standard)
+- Dependencies (spec depends on verified research)
+
+**Total Context Retrieval (D.R.Y. Principle):**
+
+**Before researching Q50 drivetrain:**
+1. Query graph: "What do we already know about Q50 drivetrain?"
+2. Retrieve: Verified specs, research sources, confidence levels
+3. Identify gaps: What still needs research?
+4. Research ONLY the gaps (don't duplicate work)
+
+**Before making decision:**
+1. Query graph: "What related decisions have we made? What did we learn?"
+2. Retrieve: Similar contexts, outcomes, lessons
+3. Apply lessons: Avoid repeating mistakes
+4. Make informed decision based on accumulated knowledge
+
+**Before writing content:**
+1. Query graph: "What verified facts exist for this topic?"
+2. Retrieve: All related research with sources and confidence
+3. Write with full knowledge base available
+4. Ensure consistency across all content
+
+**Self-Improvement Loop:**
+
+**Training Data Generation:**
+- Every verified research finding → training example
+- Every correction/lesson → fine-tuning data
+- Every successful reasoning chain → few-shot example
+- Every quality standard → evaluation metric
+
+**Model Distillation:**
+- Platform's accumulated knowledge → train specialized models
+- Automotive research agent trained on our verified specs
+- Quality control agent trained on our standards
+- Writing agent trained on our voice and precision requirements
+
+**Continuous Evolution:**
+- Platform analyzes its own logs
+- Identifies patterns in failures
+- Refines standards automatically
+- Suggests process improvements
+- Becomes more precise over time
+
+**The Compounding Effect:**
+
+**Month 1:**
+- Research Q50 drivetrain (30 hours)
+- Establish quality standards
+- Learn from RS4 pricing failure
+
+**Month 6:**
+- Q50 research reusable for related content
+- Quality standards prevent similar failures
+- Research time for new platform: 15 hours (using lessons learned)
+
+**Month 12:**
+- Knowledge base covers 10+ platforms
+- Research patterns established
+- New platform research: 8 hours (query existing knowledge + fill gaps)
+- Content quality higher (accumulated lessons applied)
+
+**Year 2:**
+- Platform trained on its own verified research
+- Automated fact-checking against knowledge base
+- Research assistant suggests relevant prior findings
+- Quality compound interest in full effect
+
+**Why This Matters:**
+
+**Without total context preservation:**
+- Research Q50 drivetrain, lose notes, research again (wasteful)
+- Make mistake, forget lesson, make similar mistake (no learning)
+- Write article, can't remember sources, re-verify everything (inefficient)
+- Build platform knowledge, context compacts, knowledge lost (tragic)
+
+**With total context preservation:**
+- Research once, use forever (efficient)
+- Fail once, never repeat (learning)
+- Verify once, cite forever (credible)
+- Every conversation makes the platform better (compounding)
+
+**Current State Preparation:**
+
+To enable future Graph RAG integration, current logs must include:
+- Comprehensive tagging (enables relationship discovery)
+- Consistent formatting (enables automated parsing)
+- Entity-rich summaries (enables node extraction)
+- Cross-reference related logs (enables relationship mapping)
+- Source documentation (enables fact verification)
+- Confidence levels (enables quality filtering)
+
+**The logs we create today are the foundation for the intelligent system tomorrow.**
 
 ---
 
