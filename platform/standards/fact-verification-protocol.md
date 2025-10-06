@@ -175,9 +175,9 @@ Guidelines without enforcement fail. This protocol ENFORCES verification before 
 **(See writing-style-guide.md Language Precision Standards section for complete rules)**
 
 ### Banned Without Quantification
-- rare, common, many, few, most, often, popular, expensive, cheap
-- fast, slow, reliable, unreliable
-- better, worse (without specific metric)
+- "rare", "common", "many", "few", "most", "often", "popular", "expensive", "cheap"
+- "fast", "slow", "reliable", "unreliable"
+- "better", "worse" (without specific metric)
 
 ### Required Format
 
@@ -192,7 +192,7 @@ Guidelines without enforcement fail. This protocol ENFORCES verification before 
 
 ### The Absolutes Rule
 
-**Only use "always," "never," "all," "none," "can't," "impossible" when:**
+**Only use "always", "never", "all", "none", "can't", "impossible" when:**
 - Physically/mechanically provable (100% or 0% occurrence)
 - Can be verified across ALL instances
 - No exceptions exist or could exist

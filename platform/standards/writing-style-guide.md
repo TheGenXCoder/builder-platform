@@ -389,14 +389,14 @@ Every claim must be quantifiable, verifiable, or explicitly acknowledged as unve
 **Before ANY content publishes, audit every sentence for:**
 
 ### Banned Subjective Qualifiers
-- [ ] No use of "rare," "common," "many," "few," "most," "often," "popular," "expensive" without quantification
-- [ ] All comparative terms ("better," "worse," "faster") include specific metrics
-- [ ] All frequency terms ("often," "rarely") replaced with percentages or counts
+- [ ] No use of "rare", "common", "many", "few", "most", "often", "popular", "expensive" without quantification
+- [ ] All comparative terms ("better", "worse", "faster") include specific metrics
+- [ ] All frequency terms ("often", "rarely") replaced with percentages or counts
 
 ### Inappropriate Absolutes
-- [ ] "Always," "never," "all," "none" used only when provably 100%/0%
+- [ ] "Always", "never", "all", "none" used only when provably 100%/0%
 - [ ] "Can't" and "impossible" used only for physical/mechanical constraints
-- [ ] Behavioral patterns use "typically," "in X% of cases," not absolutes
+- [ ] Behavioral patterns use "typically", "in X% of cases", not absolutes
 
 ### Quantification
 - [ ] All power figures include units and rpm where applicable
@@ -551,9 +551,9 @@ Every claim must be quantifiable, verifiable, or explicitly acknowledged as unve
 - [ ] Technical terms defined on first use
 
 ### Precision Language Gate
-- [ ] No subjective qualifiers without quantification (rare, common, many, few, often, expensive)
-- [ ] No inappropriate absolutes (always, never, all, none without proof)
-- [ ] All comparatives include specific metrics (faster = X seconds difference)
+- [ ] No subjective qualifiers without quantification ("rare", "common", "many", "few", "often", "expensive")
+- [ ] No inappropriate absolutes ("always", "never", "all", "none" without proof)
+- [ ] All comparatives include specific metrics ("faster" = X seconds difference)
 - [ ] All quantifiable claims are quantified (power, price, time, frequency, rarity)
 - [ ] Data gaps explicitly acknowledged, not filled with vague language
 - [ ] Relative terms include context (rare compared to what?)
