@@ -141,8 +141,8 @@ Establish legitimate performance heritage and technical DNA that connects Q50 to
 **Research Questions:**
 - Why didn't Q50 capture enthusiast attention like M3/C63/RS4?
 - Was it marketing? Performance shortcomings? Brand perception?
-- Did automotive press miss something? (They often do with Infiniti)
-- Is the used market starting to recognize Q50 value? (Prices trending up?)
+- Did automotive press miss something? (Historical pattern: Infiniti consistently receives less coverage than German competitors - quantify coverage volume)
+- Is the used market starting to recognize Q50 value? (Quantify price trends: X% change over Y years)
 
 **Narrative Hooks to Develop:**
 - "The overlooked weapon: why Q50 never got its due"
@@ -270,7 +270,7 @@ Before historical narrative is written:
 
 3. **Mercedes-AMG C43/C63**
    - Same analysis
-   - Note: C43 is direct competitor, C63 is aspirational comparison
+   - Note: C43 comparable specs/price to Q50 Red Sport (300-400hp, $45-60k range); C63 higher tier (450-500hp+, $65-80k+ range)
 
 4. **Cadillac ATS-V/CTS-V (Blackwing)**
    - Domestic super saloon comparison
@@ -306,10 +306,10 @@ Before historical narrative is written:
 - At what price point does Q50 become compelling vs alternatives?
 - Can modified Q50 outperform stock competitors on track?
 
-**Narrative Hooks:**
-- "Dollar-for-dollar performance comparison"
-- "The platform they dismissed, the performance they didn't expect"
-- "Where badge prestige costs more than engineering substance"
+**Narrative Hooks to Develop with Quantified Evidence:**
+- "Dollar-for-dollar performance comparison" ($/hp, $/0-60 time, price delta for equivalent performance)
+- "The platform automotive media overlooked" (quantify: coverage volume, review count vs competitors, forum activity metrics, sales figures vs performance capability)
+- "Where badge premium exceeds measurable performance advantage" (quantify: price delta vs performance specs, lap times, acceleration figures)
 
 ---
 
@@ -344,14 +344,14 @@ Before historical narrative is written:
    - VR engine family legitimacy
 
 2. **The Overlooked Platform**
-   - Why market dismissed it
-   - What reviewers missed
-   - Engineering substance vs badge prestige
+   - Why market dismissed it (quantify: sales volume vs segment, media coverage analysis, forum activity metrics)
+   - What reviewers missed (specific performance metrics, cost-per-hp analysis, modification potential data)
+   - Measurable performance vs price premium ($/hp, lap time/$, 0-60/$)
 
 3. **The Gentleman's Weapon**
-   - Luxury + performance duality
-   - Understated capability
-   - The "sleeper" that wasn't intentional
+   - Luxury + performance duality (quantify both: luxury features count/quality vs 0-60, hp/torque, track capability)
+   - Low-visibility performance (stock appearance, lack of aggressive styling vs measured performance)
+   - Market positioning gap (performance exceeds perception - quantify perception via reviews/sales vs actual specs)
 
 4. **The Opportunity**
    - Value proposition in used market

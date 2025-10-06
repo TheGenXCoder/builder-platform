@@ -231,6 +231,217 @@ Guidelines without enforcement fail. This protocol ENFORCES verification before 
 
 ---
 
+## Handling Conflicting Measurements
+
+### When Two Data Sources Give Different Numbers
+
+**The "Flashing Neon Sign" - Conflicting data is a RED FLAG.**
+
+When two sources provide different measurements for the same thing, this indicates a problem that MUST be investigated before claiming either as fact.
+
+### The Conflict Resolution Process
+
+**Step 1: Acknowledge BOTH Data Points**
+
+Do NOT pick one and state it as fact. Document the conflict explicitly.
+
+**Example:**
+```markdown
+**Conflict Identified:**
+- Source A (Internal token counter): 135,417 / 200,000 tokens (32% remaining)
+- Source B (User-visible status): Context left until auto-compact: 5%
+- Discrepancy: 27 percentage points difference
+```
+
+**Step 2: Investigate the Discrepancy**
+
+Ask critical questions:
+- What is each source actually measuring?
+- Do they measure the same thing or different things?
+- Which measurement is relevant to your use case?
+- Why might they disagree?
+- Is one more authoritative than the other?
+
+**Example investigation:**
+- Internal counter measures tokens consumed
+- Auto-compact metric measures proximity to system action
+- These may account for overhead differently
+- Auto-compact metric is authoritative for triggering logging (use case)
+- Internal counter may not reflect true system state
+
+**Step 3: Determine Authority**
+
+**Priority order for authority determination:**
+
+1. **User-observable metrics** > Internal calculations
+   - What user can verify independently
+   - Direct system measurements
+   - Example: Status bar auto-compact percentage
+
+2. **Tier 1 sources** > Tier 2/3 sources
+   - Official documentation > community data
+   - Manufacturer specs > third-party testing
+
+3. **More recent data** > Older data
+   - Updated specs > original launch specs
+   - Current market data > historical estimates
+
+4. **Direct measurement** > Calculated estimate
+   - Actual dyno result > horsepower calculation
+   - Measured dimension > specification tolerance
+
+5. **Conservative estimate** when uncertain
+   - Lower of two conflicting numbers if safety-critical
+   - Example: If context shows 32% and 5%, use 5%
+
+**Step 4: State Finding With Confidence Level**
+
+**If authority is clear:**
+```markdown
+**Authoritative Measurement:** User-visible auto-compact metric shows 5% remaining.
+
+**Note:** Internal token counter shows 32% remaining (135k/200k tokens), but auto-compact metric is authoritative for logging triggers as it directly reflects system state. Discrepancy acknowledged but does not affect decision (use 5% for logging trigger).
+
+**Confidence:** 95%+ (authoritative source clear, conflict explained)
+```
+
+**If authority is unclear:**
+```markdown
+**Conflicting Data:**
+- Source A claims 420 hp
+- Source B claims 414 hp
+
+**Investigation:** Testing methodology difference (SAE net vs DIN standard). Both correct within their methodology.
+
+**For US market:** 420 hp (SAE net) is applicable specification.
+
+**Confidence:** 90% (methodology explains discrepancy, appropriate spec selected)
+```
+
+**If conflict is unresolvable:**
+```markdown
+**Unresolved Conflict:**
+- Source A: $35,000 average price
+- Source B: $28,000 average price
+
+**Investigation:** Different geographic markets (Source A: California, Source B: Midwest). Both may be accurate for their regions.
+
+**Range stated:** $28,000-$35,000 depending on region.
+
+**Confidence:** 80% (both sources credible but regional variance not fully understood)
+
+**[REQUIRES FURTHER VERIFICATION]** - Geographic price variance needs more data
+```
+
+### What NOT To Do With Conflicts
+
+❌ **Pick one source without acknowledging the other**
+- This is what happened with token counter vs auto-compact
+- Destroys credibility when conflict is discovered
+
+❌ **Average conflicting numbers**
+- May not be meaningful (e.g., averaging SAE and DIN horsepower)
+- Hides the fact that sources disagree
+
+❌ **State "approximately" to hide conflict**
+- Using "approximately 30%" when you have 32% and 5% is dishonest
+- Implies precision you don't have
+
+❌ **Assume newer/higher/lower is correct**
+- Authority must be determined, not assumed
+
+✅ **DO acknowledge, investigate, determine authority, state confidence**
+
+### Examples: Proper Conflict Handling
+
+**Example 1: System Metrics (Today's Lesson)**
+
+**Conflict:**
+- Internal token counter: 32% context remaining
+- Status bar: 5% until auto-compact
+
+**Proper handling:**
+```markdown
+**Conflict observed:** Internal calculation shows 32% remaining, but user-visible auto-compact metric shows 5%.
+
+**Authority determination:** Auto-compact metric is authoritative because:
+1. User-observable (independently verifiable)
+2. Directly measures system state
+3. Determines actual auto-compact trigger
+
+**Action:** Log immediately (5% is past 20% threshold).
+
+**Confidence:** 95%+ (authoritative metric clear)
+```
+
+**Example 2: Performance Specifications**
+
+**Conflict:**
+- Manufacturer claims: 4.8 seconds 0-60
+- Car & Driver tested: 4.6 seconds
+- Motor Trend tested: 4.7 seconds
+
+**Proper handling:**
+```markdown
+**Conflict observed:** Three different 0-60 times from credible sources.
+
+**Investigation:**
+- Manufacturer claims are typically conservative
+- Professional testing shows 4.6-4.7 second range
+- Variance explained by testing conditions (temperature, altitude, fuel load)
+
+**Authority:** Professional testing (Tier 2) confirmed manufacturer claim (Tier 1) conservative.
+
+**Stated as:** "0-60 mph in 4.6-4.8 seconds. Manufacturer claims 4.8 seconds; independent testing verified 4.6-4.7 seconds under professional test conditions."
+
+**Confidence:** 95%+ (multiple sources, variance explained)
+```
+
+**Example 3: Pricing Data**
+
+**Conflict:**
+- CarGurus average: $38,000 (50 listings)
+- BringATrailer sold: $42,000 (auction result)
+- Owner forum: "I paid $35,000"
+
+**Proper handling:**
+```markdown
+**Conflict observed:** Pricing varies from $35,000 to $42,000.
+
+**Investigation:**
+- CarGurus: Asking prices (not sold prices)
+- BringATrailer: Auction premium typical
+- Forum post: Single data point, limited condition info
+
+**Authority:** CarGurus provides largest sample of current asking prices.
+
+**Stated as:** "$35,000-$40,000 based on current market listings (CarGurus, 50 active listings, October 2024). Auction results may exceed this range (BringATrailer recent sale: $42,000)."
+
+**Confidence:** 85% (good sample size, but asking ≠ selling prices)
+```
+
+### The Meta-Lesson
+
+**This applies everywhere:**
+- Research data (specs, prices, production numbers)
+- System metrics (context, tokens, performance)
+- Testing results (dyno, track times, measurements)
+- ANY scenario where numbers don't align
+
+**When data conflicts = Opportunity to demonstrate rigor.**
+
+Handle conflicts properly:
+1. Builds credibility (you didn't hide the discrepancy)
+2. Shows methodology (you investigated)
+3. Demonstrates expertise (you determined authority)
+4. Protects reputation (you didn't guess)
+
+**"I'm a numbers guy and when I see things like this, it's much like a flashing neon sign."**
+
+Don't ignore the neon sign. Investigate it.
+
+---
+
 ## Real-Time Citation Requirements
 
 ### In Conversation

@@ -84,10 +84,10 @@ This document defines the technical research requirements for the Q50 Super Salo
 | Turbo Failure | Shaft play, compressor wheel damage | [Need data] - at what mileage/power | Upgrade to [specific turbos] | Failure analysis + replacements | Tier 2 |
 | Fuel Pump Failure | Pressure drop under load | [Need data] | Upgrade to [specific pump] | Known failures + upgrades | Tier 2 |
 | Carbon Buildup (DI) | Intake valve deposits, performance loss | Mileage-based, not power-based | Walnut blasting, catch can | Known issue + solutions | Tier 2 |
-| Ignition Coil Failure | Misfires under boost | Age/mileage related | Upgrade to [better coils] | Known issue + solutions | Tier 2 |
+| Ignition Coil Failure | Misfires under boost | Age/mileage related | Upgrade to [specific higher-output coils with part numbers] | Known issue + solutions | Tier 2 |
 
 **Critical Research Questions:**
-1. **Head lifting**: At what boost/power does this occur? What's the mechanism? How common? What's the proven fix? Cost?
+1. **Head lifting**: At what boost/power does this occur? What's the mechanism? What percentage of builds at X psi experience this failure? What's the proven fix? Cost?
 2. **Safe power limits on stock internals**: What's the community consensus with failure data to back it up?
 3. **VR30 vs VR38 architecture**: Are they related enough that internals interchange? Block/head bolt patterns same?
 
@@ -236,13 +236,19 @@ This document defines the technical research requirements for the Q50 Super Salo
 
 ### Decision Tree Research Requirements:
 
+**Cost Scale Definition:**
+- Lowest: $0-5k | Low: $5-15k | Moderate: $15-30k | High: $30-50k | Highest: $50k+
+
+**Complexity Scale Definition:**
+- Low: Bolt-on parts, basic tuning | Moderate: Machine work, custom fabrication | High: Engine/trans swap, extensive fab
+
 **1. VR30 Built vs VR38 Swap**
 
 | Scenario | Cost | Complexity | Power Potential | Reliability | Parts Availability | Decision Confidence |
 |---|---|---|---|---|---|---|
-| **VR30 Stock Block (500-600hp)** | Lowest | Low | Moderate | High (if done right) | Excellent | Need 95%+ |
-| **VR30 Built Block (700-800hp)** | Moderate | Moderate | High | High (with quality build) | Good | Need 95%+ |
-| **VR38 Swap (unlimited)** | Highest | High | Highest | ? | Good | Need 95%+ |
+| **VR30 Stock Block (500-600hp)** | Lowest ($0-5k) | Low | Moderate (500-650hp) | High (if done right) | Excellent | Need 95%+ |
+| **VR30 Built Block (700-800hp)** | Moderate ($15-30k) | Moderate | High (700-900hp) | High (with quality build) | Good | Need 95%+ |
+| **VR38 Swap (unlimited)** | Highest ($50k+) | High | Highest (900hp+) | ? | Good | Need 95%+ |
 
 **Research Required:**
 - VR30 stock block safe limit (with head studs, proper tune)
@@ -254,9 +260,9 @@ This document defines the technical research requirements for the Q50 Super Salo
 
 | Option | Control/Engagement | Traction (AWD?) | Reliability | Cost | Decision Confidence |
 |---|---|---|---|---|---|
-| **7AT Tuned + Upgraded** | Moderate | Yes (AWD) | Good | Moderate | Need 95%+ |
-| **Manual Swap + AWD (if possible)** | Excellent | Yes | Unknown | High | Need 95%+ |
-| **Manual Swap RWD Only** | Excellent | No | Good | High | Need 95%+ |
+| **7AT Tuned + Upgraded** | Moderate | Yes (AWD) | Good (75-85%) | Moderate ($15-30k) | Need 95%+ |
+| **Manual Swap + AWD (if possible)** | Excellent | Yes | Unknown | High ($30-50k) | Need 95%+ |
+| **Manual Swap RWD Only** | Excellent | No | Good (75-85%) | High ($30-50k) | Need 95%+ |
 
 **Research Required:**
 - 7AT power limits with all upgrades
@@ -266,13 +272,16 @@ This document defines the technical research requirements for the Q50 Super Salo
 
 **3. Turbo Upgrade Path**
 
+**Reliability Scale Definition:**
+- Highest: 95-100% success rate at power level | High: 85-95% | Good: 75-85% | Moderate: 60-75%
+
 | Stage | Modifications | Power Target | Cost | Reliability | Decision Confidence |
 |---|---|---|---|---|---|
-| **Stock Turbos + Tune** | Tune only | ~400-450hp | Lowest | Highest | Need 95%+ |
-| **Stock Turbos + Bolt-ons + Tune** | DP, exhaust, intake, IC | ~450-500hp | Low | High | Need 95%+ |
-| **Upgraded Turbos (Red Sport spec if applicable)** | RS400 turbos + supporting | ~500-550hp | Moderate | High | Need 95%+ |
-| **Aftermarket Turbos (mid-size)** | Precision, Garrett, BW + supporting | ~600-700hp | High | Good | Need 95%+ |
-| **Aftermarket Turbos (large)** | Big singles or twins + built motor | ~700-800hp+ | Highest | Moderate | Need 95%+ |
+| **Stock Turbos + Tune** | Tune only | ~400-450hp | Lowest ($0-5k) | Highest (95-100%) | Need 95%+ |
+| **Stock Turbos + Bolt-ons + Tune** | DP, exhaust, intake, IC | ~450-500hp | Low ($5-15k) | High (85-95%) | Need 95%+ |
+| **Upgraded Turbos (Red Sport spec if applicable)** | RS400 turbos + supporting | ~500-550hp | Moderate ($15-30k) | High (85-95%) | Need 95%+ |
+| **Aftermarket Turbos (mid-size)** | Precision, Garrett, BW + supporting | ~600-700hp | High ($30-50k) | Good (75-85%) | Need 95%+ |
+| **Aftermarket Turbos (large)** | Big singles or twins + built motor | ~700-800hp+ | Highest ($50k+) | Moderate (60-75%) | Need 95%+ |
 
 **Research Required:**
 - What turbos are proven on VR30 at each power level?
