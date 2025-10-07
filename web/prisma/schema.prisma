@@ -1,0 +1,249 @@
+// The Builder Platform - Database Schema
+// Domain-agnostic expert content creation with knowledge compounding
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USER & AUTHENTICATION
+// ============================================================================
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Domain preference (automotive, culinary, woodworking, custom)
+  domain        Domain   @default(CUSTOM)
+
+  // Relations
+  projects      Project[]
+  facts         Fact[]
+  content       Content[]
+  logs          ConversationLog[]
+
+  @@map("users")
+}
+
+enum Domain {
+  AUTOMOTIVE
+  CULINARY
+  WOODWORKING
+  CUSTOM
+}
+
+// ============================================================================
+// PROJECTS & RESEARCH
+// ============================================================================
+
+model Project {
+  id            String   @id @default(cuid())
+  name          String
+  domain        Domain
+  description   String?
+  researchFocus String?
+  contentGoals  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Owner
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  researchSpecs ResearchSpec[]
+  findings      Finding[]
+  facts         Fact[]
+  content       Content[]
+  tags          Tag[]
+
+  @@map("projects")
+}
+
+model ResearchSpec {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  items         Json     // Array of spec items with checkboxes
+  progress      Float    @default(0) // 0-100%
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Project
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("research_specs")
+}
+
+model Finding {
+  id            String   @id @default(cuid())
+  title         String
+  data          String   @db.Text
+  notes         String?  @db.Text
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Project
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Relations
+  fact          Fact?
+
+  @@map("findings")
+}
+
+// ============================================================================
+// FACT VERIFICATION SYSTEM
+// ============================================================================
+
+model Fact {
+  id            String       @id @default(cuid())
+  claim         String       @db.Text
+  verified      Boolean      @default(false)
+  confidence    Float        // 0-100%
+  tier          SourceTier
+  source        String       @db.Text
+  sourceUrl     String?
+  notes         String?      @db.Text
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Project
+  projectId     String
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // User who verified
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Original finding (optional)
+  findingId     String?      @unique
+  finding       Finding?     @relation(fields: [findingId], references: [id], onDelete: SetNull)
+
+  // Relations
+  citations     Citation[]
+  tags          Tag[]
+
+  @@map("facts")
+}
+
+enum SourceTier {
+  TIER_1  // Primary authoritative (FSM, historical records, engineering data)
+  TIER_2  // Trusted industry (tuner shops, chef interviews, master craftsmen)
+  TIER_3  // Community validated (proven builds, documented recipes, verified techniques)
+}
+
+// ============================================================================
+// CONTENT CREATION
+// ============================================================================
+
+model Content {
+  id            String        @id @default(cuid())
+  title         String
+  type          ContentType
+  status        ContentStatus @default(DRAFT)
+  body          String        @db.Text
+  wordCount     Int           @default(0)
+  confidence    Float         @default(0) // 0-100%
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Project
+  projectId     String
+  project       Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Author
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  citations     Citation[]
+  tags          Tag[]
+
+  @@map("content")
+}
+
+enum ContentType {
+  ARTICLE
+  VIDEO_SCRIPT
+  PRESENTATION
+  SHORT_FORM
+}
+
+enum ContentStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+}
+
+model Citation {
+  id            String   @id @default(cuid())
+  position      Int      // Position in content
+  createdAt     DateTime @default(now())
+
+  // Content being cited in
+  contentId     String
+  content       Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  // Fact being cited
+  factId        String
+  fact          Fact     @relation(fields: [factId], references: [id], onDelete: Cascade)
+
+  @@map("citations")
+}
+
+// ============================================================================
+// CONVERSATION LOGS
+// ============================================================================
+
+model ConversationLog {
+  id            String   @id @default(cuid())
+  title         String
+  sessionType   String?
+  summary       String?  @db.Text
+  content       String   @db.Text
+  contextPercent Float?   // What % context was remaining when logged
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // User
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  tags          Tag[]
+
+  @@map("conversation_logs")
+}
+
+// ============================================================================
+// TAGGING & ORGANIZATION
+// ============================================================================
+
+model Tag {
+  id            String   @id @default(cuid())
+  name          String
+  createdAt     DateTime @default(now())
+
+  // Relations (many-to-many)
+  projects      Project[]
+  facts         Fact[]
+  content       Content[]
+  logs          ConversationLog[]
+
+  @@unique([name])
+  @@map("tags")
+}
