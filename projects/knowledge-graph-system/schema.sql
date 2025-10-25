@@ -102,6 +102,80 @@ CREATE TRIGGER update_projects_updated_at BEFORE UPDATE ON projects
 CREATE TRIGGER update_blocks_updated_at BEFORE UPDATE ON blocks
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Organizations (multi-tenant foundation - Week 1.5+)
+CREATE TABLE IF NOT EXISTS organizations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL UNIQUE,
+    tier TEXT DEFAULT 'individual', -- "individual", "team", "enterprise"
+    compliance_level TEXT[], -- ["hipaa", "soc2", "gdpr"]
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert default organizations
+INSERT INTO organizations (name, tier)
+VALUES ('personal', 'individual')
+ON CONFLICT (name) DO NOTHING;
+
+-- Projects belong to organizations
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES organizations(id) DEFAULT (SELECT id FROM organizations WHERE name = 'personal');
+
+-- Blocks have visibility levels
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS visibility TEXT DEFAULT 'org-private';
+-- Values: "public", "org-private", "anonymized", "individual"
+
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES organizations(id) DEFAULT (SELECT id FROM organizations WHERE name = 'personal');
+
+-- Source attribution for blocks (public knowledge)
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS source_url TEXT; -- Original source URL
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS source_attribution TEXT; -- Citation text
+
+-- Import history tracking (Week 1.5)
+CREATE TABLE IF NOT EXISTS import_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_file TEXT NOT NULL,
+    file_hash TEXT NOT NULL,
+    imported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    block_count INT NOT NULL,
+    import_type TEXT NOT NULL, -- "conversation-log", "spec", "doc", "working-file"
+    status TEXT DEFAULT 'completed', -- "in-progress", "completed", "failed"
+    error_message TEXT,
+
+    -- Visibility and organization tracking
+    visibility TEXT DEFAULT 'org-private', -- "public", "org-private", "individual"
+    source_classification TEXT, -- "public-web", "private-repo", "client-data", "personal"
+    organization_id UUID REFERENCES organizations(id),
+
+    UNIQUE(source_file, file_hash)
+);
+
+-- Source tracking for blocks (enables reimport and updates)
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS source_file TEXT;
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS source_type TEXT; -- "conversation-log", "spec", etc.
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS source_hash TEXT;
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS import_batch_id UUID REFERENCES import_history(id) ON DELETE SET NULL;
+
+-- Public knowledge pool (future - Week 2+)
+CREATE TABLE IF NOT EXISTS public_knowledge (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    block_id UUID REFERENCES blocks(id) ON DELETE CASCADE,
+    source_url TEXT NOT NULL,
+    source_type TEXT, -- "stackoverflow", "github", "documentation"
+    verified BOOLEAN DEFAULT FALSE,
+    contribution_count INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for import queries
+CREATE INDEX IF NOT EXISTS idx_import_history_source_file ON import_history(source_file);
+CREATE INDEX IF NOT EXISTS idx_import_history_status ON import_history(status);
+CREATE INDEX IF NOT EXISTS idx_import_history_org ON import_history(organization_id);
+CREATE INDEX IF NOT EXISTS idx_blocks_source ON blocks(source_file, source_hash);
+CREATE INDEX IF NOT EXISTS idx_blocks_visibility ON blocks(visibility, organization_id);
+CREATE INDEX IF NOT EXISTS idx_blocks_org ON blocks(organization_id);
+CREATE INDEX IF NOT EXISTS idx_public_knowledge_url ON public_knowledge(source_url);
+
 -- Insert default project for current work
 INSERT INTO projects (name, directory_path)
 VALUES ('builder-platform', '/Users/BertSmith/personal/builder-platform')
