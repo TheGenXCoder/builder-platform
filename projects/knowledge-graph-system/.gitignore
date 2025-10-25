@@ -1,0 +1,9 @@
+# Binaries
+knowledge
+mcp-server
+
+# Go
+*.exe
+*.dll
+*.so
+*.dylib

@@ -137,6 +137,57 @@ This system IS the Graph RAG architecture described in builder-platform/README.m
 - Any domain research → searchable forever
 - Cross-domain learning from patterns
 
+## Installation
+
+### Prerequisites
+
+1. **PostgreSQL 17** with pgvector extension
+   ```bash
+   brew install postgresql@17 pgvector
+   brew services start postgresql@17
+   ```
+
+2. **Ollama** with nomic-embed-text model
+   ```bash
+   brew install ollama
+   ollama serve  # In one terminal
+   ollama pull nomic-embed-text  # In another
+   ```
+
+3. **Go 1.21+**
+   ```bash
+   brew install go
+   ```
+
+### Setup
+
+1. **Initialize database**
+   ```bash
+   createdb knowledge_graph
+   psql knowledge_graph < schema.sql
+   ```
+
+2. **Build binaries**
+   ```bash
+   go build -o knowledge ./cmd/knowledge
+   go build -o mcp-server ./cmd/mcp-server
+   ```
+
+3. **Test the system**
+   ```bash
+   ./knowledge test
+   ```
+
+   Expected output:
+   ```
+   ✅ All tests passed!
+   ✓ Search completed in 67ms
+   ```
+
+4. **Setup Claude Code integration**
+
+   See [MCP-SETUP.md](./MCP-SETUP.md) for detailed MCP configuration.
+
 ## Product Strategy
 
 ### MVP (Fundable Product)
@@ -231,8 +282,40 @@ This system IS the Graph RAG architecture described in builder-platform/README.m
 
 ## Current Status
 
-**Phase:** Project initialization
-**Next Steps:** Product planning with /plan-product
+**Phase:** Week 1 Implementation Complete ✅
+
+**Shipped (2025-10-24):**
+- ✅ PostgreSQL 17 + pgvector database
+- ✅ Block-based storage (768-dim vectors)
+- ✅ Semantic + keyword hybrid search
+- ✅ Ollama embeddings (nomic-embed-text)
+- ✅ MCP server for Claude Code integration
+- ✅ Sub-200ms search performance (67ms achieved)
+- ✅ Go CLI test harness
+- ✅ Auto-project detection
+
+**Week 1 Success Metric:** ✅ I STOP LOSING CONTEXT
+
+**Next Steps:**
+- Week 2: Tag extraction, relationship inference
+- Week 3: Pattern recognition, auto-workflow codification
+- Week 4: Neovim plugin, autonomous alpha discovery
+
+**Quick Start:**
+
+See [Installation](#installation) and [MCP Setup](./MCP-SETUP.md) for getting started.
+
+```bash
+# Test the system
+./knowledge test
+
+# Search knowledge
+./knowledge search "PostgreSQL setup"
+
+# Use from Claude Code via MCP
+# (See MCP-SETUP.md for configuration)
+```
+
 **Location:** `builder-platform/projects/knowledge-graph-system/`
 
 ---
