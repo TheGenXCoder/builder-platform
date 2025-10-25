@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -46,13 +47,14 @@ func Discover(opts ImportOptions) ([]ImportSource, error) {
 					return fmt.Errorf("failed to hash file %s: %w", path, err)
 				}
 
-				sources = append(sources, ImportSource{
+				source := ImportSource{
 					FilePath:     path,
 					FileType:     pattern.Type,
 					LastModified: info.ModTime(),
 					FileHash:     hash,
 					FileSize:     info.Size(),
-				})
+				}
+				sources = append(sources, source)
 				break
 			}
 		}
@@ -62,6 +64,16 @@ func Discover(opts ImportOptions) ([]ImportSource, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to discover files: %w", err)
+	}
+
+	// Log file type breakdown
+	typeCounts := make(map[string]int)
+	for _, s := range sources {
+		typeCounts[s.FileType]++
+	}
+	log.Printf("[DISCOVERY] File type breakdown:")
+	for fileType, count := range typeCounts {
+		log.Printf("[DISCOVERY]   %s: %d files", fileType, count)
 	}
 
 	return sources, nil

@@ -220,11 +220,3 @@ func readFileContent(filePath string) (string, error) {
 
 	return content.String(), scanner.Err()
 }
-
-// Add to ImportSource to store classification metadata
-func (s *ImportSource) AddMetadata(key string, value interface{}) {
-	if s.Metadata == nil {
-		s.Metadata = make(map[string]interface{})
-	}
-	s.Metadata[key] = value
-}

@@ -29,6 +29,15 @@ type Block struct {
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`
 
+	// Visibility and attribution (Week 1.5+)
+	Visibility        string     `json:"visibility,omitempty"`        // "public", "org-private", "individual"
+	OrganizationID    *uuid.UUID `json:"organization_id,omitempty"`
+	SourceURL         string     `json:"source_url,omitempty"`        // For attribution (web sources)
+	SourceAttribution string     `json:"source_attribution,omitempty"` // Citation text
+	SourceFile        string     `json:"source_file,omitempty"`       // Import source file
+	SourceType        string     `json:"source_type,omitempty"`       // "conversation-log", "spec", etc.
+	SourceHash        string     `json:"source_hash,omitempty"`       // File hash for deduplication
+
 	// Relations (not stored in DB, populated by queries)
 	Exchanges     []Exchange     `json:"exchanges,omitempty"`
 	Tags          []Tag          `json:"tags,omitempty"`
