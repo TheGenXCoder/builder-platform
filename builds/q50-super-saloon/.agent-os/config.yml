@@ -1,0 +1,32 @@
+version: 2.0.3
+subproject_install: true
+
+# ================================================
+# SUBPROJECT CONFIGURATION
+# Q50 Super Saloon - Automotive Domain
+# ================================================
+
+# Inherits from parent project configuration
+inherits_from: ../../agent-os/config.yml
+
+# Subproject-specific settings
+subproject:
+  name: q50-super-saloon
+  domain: automotive
+  description: "600-800hp gentleman's weapon build"
+
+# Multi-agent mode (inherited from parent)
+multi_agent_mode: true
+multi_agent_tool: claude-code
+
+# Profile (inherited from parent)
+profile: default
+
+# Subproject-specific standards location
+standards_path: ./standards/automotive
+
+# Parent standards (inherited)
+parent_standards:
+  - ~/personal/builder-platform/agent-os/standards
+  - ~/personal/builder-platform/platform/standards
+  - ~/.agent-os/profiles/default/standards
