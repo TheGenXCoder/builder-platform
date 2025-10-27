@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalyst9-config
+  namespace: catalyst9
+data:
+  PORT: "8080"
+  DB_HOST: postgres
+  DB_NAME: catalyst9
+  DB_USER: catalyst9
+  REDIS_HOST: redis:6379
+  OLLAMA_HOST: http://ollama:11434
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: catalyst9-secret
+  namespace: catalyst9
+type: Opaque
+stringData:
+  DB_PASSWORD: catalyst9_prod_$(openssl rand -hex 12)
+  JWT_SECRET: $(openssl rand -hex 32)
+  API_KEY: $(openssl rand -hex 32)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalyst9-api
+  namespace: catalyst9
+  labels:
+    app: catalyst9-api
+    version: v0.9.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: catalyst9-api
+  template:
+    metadata:
+      labels:
+        app: catalyst9-api
+        version: v0.9.0
+    spec:
+      containers:
+      - name: catalyst9-api
+        image: catalyst9/api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        envFrom:
+        - configMapRef:
+            name: catalyst9-config
+        - secretRef:
+            name: catalyst9-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      initContainers:
+      # Wait for PostgreSQL
+      - name: wait-for-postgres
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done']
+      # Wait for Redis
+      - name: wait-for-redis
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z redis 6379; do echo waiting for redis; sleep 2; done']
+      # Wait for Ollama
+      - name: wait-for-ollama
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z ollama 11434; do echo waiting for ollama; sleep 2; done']
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalyst9-api
+  namespace: catalyst9
+  labels:
+    app: catalyst9-api
+spec:
+  selector:
+    app: catalyst9-api
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: catalyst9-api-hpa
+  namespace: catalyst9
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: catalyst9-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

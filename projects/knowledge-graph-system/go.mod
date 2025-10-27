@@ -1,11 +1,14 @@
-module github.com/TheGenXCoder/knowledge-graph
+module github.com/catalyst9/catalyst-core
 
-go 1.25.0
+go 1.21.0
 
 require (
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/mux v1.8.1
+	github.com/gorilla/websocket v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/pgvector/pgvector-go v0.3.0
+	github.com/rs/cors v1.10.1
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
 )

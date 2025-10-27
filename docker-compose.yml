@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # PostgreSQL with pgvector extension
+  postgres:
+    image: ankane/pgvector:v0.5.1-pg17
+    container_name: catalyst9-postgres
+    environment:
+      POSTGRES_USER: catalyst9
+      POSTGRES_PASSWORD: catalyst9_dev
+      POSTGRES_DB: catalyst9
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./deploy/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - catalyst9-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catalyst9"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: catalyst9-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - catalyst9-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Ollama for embeddings and local LLM
+  ollama:
+    image: ollama/ollama:latest
+    container_name: catalyst9-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - catalyst9-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Auto-pull required models on startup
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "ollama serve &
+       sleep 5 &&
+       ollama pull nomic-embed-text &&
+       ollama pull llama3 &&
+       ollama pull codellama &&
+       wait"
+
+  # Catalyst9 API
+  catalyst9-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: catalyst9-api
+    environment:
+      PORT: 8080
+      DB_HOST: postgres
+      DB_NAME: catalyst9
+      DB_USER: catalyst9
+      DB_PASSWORD: catalyst9_dev
+      REDIS_HOST: redis:6379
+      JWT_SECRET: development_jwt_secret
+      OLLAMA_HOST: http://ollama:11434
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    networks:
+      - catalyst9-network
+    volumes:
+      - ./projects/knowledge-graph-system:/app
+      - ./web/dist:/root/web/dist:ro
+    restart: unless-stopped
+
+  # NGINX reverse proxy (optional for local dev)
+  nginx:
+    image: nginx:alpine
+    container_name: catalyst9-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/catalyst9-docker.conf:/etc/nginx/conf.d/default.conf:ro
+      - /Users/BertSmith/.credentials/.catalyst9.ai:/etc/catalyst9/ssl:ro
+    depends_on:
+      - catalyst9-api
+    networks:
+      - catalyst9-network
+    restart: unless-stopped
+
+  # pgAdmin for database management (optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: catalyst9-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@catalyst9.ai
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    networks:
+      - catalyst9-network
+    profiles:
+      - debug
+
+networks:
+  catalyst9-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  ollama_data:

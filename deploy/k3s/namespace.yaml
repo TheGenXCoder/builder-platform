@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: catalyst9
+  labels:
+    app: catalyst9
+    environment: production
