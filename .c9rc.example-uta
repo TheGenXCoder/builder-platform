@@ -1,0 +1,22 @@
+# Catalyst9 Context Example - UTA Project
+# Copy this to your UTA project directory as .c9rc
+
+# Organization context
+C9_ORG=uta
+
+# Default visibility for knowledge added in this project
+# org = shared with all UTA members
+C9_DEFAULT_VISIBILITY=org
+
+# Default tags to auto-apply to knowledge in this context
+C9_DEFAULT_TAGS=uta,api-integration,client-work
+
+# Search scope (personal, org, team, project, all)
+# org = search only UTA organization knowledge
+C9_SEARCH_SCOPE=org
+
+# Project identifier
+C9_PROJECT=uta-api-integration
+
+# Description
+C9_PROJECT_DESC="UTA API Integration - Client Project"

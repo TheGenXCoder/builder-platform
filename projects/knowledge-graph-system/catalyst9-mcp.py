@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Catalyst9 MCP Client - Universal Access
+Catalyst9 MCP Client - Universal Access with Project Context
 Connect from any machine with proper credentials
+Supports multi-project/org context switching via .c9rc files
 """
 
 import json
@@ -10,11 +11,47 @@ import os
 import requests
 from typing import Dict, Any, Optional
 from datetime import datetime
+from pathlib import Path
 
-# Configuration from environment
+def load_project_context():
+    """
+    Load project context from .c9rc file
+    Walks up directory tree to find .c9rc
+    """
+    context = {}
+
+    # Start from current working directory
+    current = Path.cwd()
+
+    # Walk up to find .c9rc
+    for parent in [current] + list(current.parents):
+        c9rc = parent / '.c9rc'
+        if c9rc.exists():
+            with open(c9rc, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        if '=' in line:
+                            key, value = line.split('=', 1)
+                            context[key.strip()] = value.strip()
+            break
+
+    return context
+
+# Load project context first
+PROJECT_CONTEXT = load_project_context()
+
+# Configuration from environment (overrides .c9rc)
 API_URL = os.environ.get("CATALYST9_API_URL", "https://catalyst9.ai")
 USER = os.environ.get("CATALYST9_USER", "anonymous")
 API_KEY = os.environ.get("CATALYST9_API_KEY", "")
+
+# Context defaults from .c9rc (can be overridden by environment)
+DEFAULT_ORG = os.environ.get("C9_ORG", PROJECT_CONTEXT.get("C9_ORG", ""))
+DEFAULT_VISIBILITY = os.environ.get("C9_DEFAULT_VISIBILITY", PROJECT_CONTEXT.get("C9_DEFAULT_VISIBILITY", "private"))
+DEFAULT_TAGS = os.environ.get("C9_DEFAULT_TAGS", PROJECT_CONTEXT.get("C9_DEFAULT_TAGS", ""))
+SEARCH_SCOPE = os.environ.get("C9_SEARCH_SCOPE", PROJECT_CONTEXT.get("C9_SEARCH_SCOPE", "all"))
+PROJECT_NAME = os.environ.get("C9_PROJECT", PROJECT_CONTEXT.get("C9_PROJECT", ""))
 
 class Catalyst9MCP:
     def __init__(self):
@@ -22,6 +59,14 @@ class Catalyst9MCP:
         self.user = USER
         self.api_key = API_KEY
         self.session = requests.Session()
+
+        # Project context
+        self.default_org = DEFAULT_ORG
+        self.default_visibility = DEFAULT_VISIBILITY
+        self.default_tags = [t.strip() for t in DEFAULT_TAGS.split(',') if t.strip()]
+        self.search_scope = SEARCH_SCOPE
+        self.project_name = PROJECT_NAME
+        self.context_source = "project" if PROJECT_CONTEXT else "environment"
 
         # Set authentication header if API key provided
         if self.api_key:
@@ -55,9 +100,17 @@ class Catalyst9MCP:
             return self.error_response(request_id, -32603, str(e))
 
     def initialize(self) -> Dict[str, Any]:
-        """Initialize the MCP server with user info"""
+        """Initialize the MCP server with user and context info"""
         # Verify authentication if API key provided
         auth_status = "authenticated" if self.api_key else "anonymous"
+
+        context_info = {
+            "org": self.default_org if self.default_org else "personal",
+            "project": self.project_name if self.project_name else "none",
+            "visibility": self.default_visibility,
+            "searchScope": self.search_scope,
+            "contextSource": self.context_source
+        }
 
         return {
             "protocolVersion": "2024-11-05",
@@ -67,9 +120,10 @@ class Catalyst9MCP:
             },
             "serverInfo": {
                 "name": "catalyst9-knowledge-graph",
-                "version": "1.0.0",
+                "version": "1.1.0",
                 "user": self.user,
-                "authStatus": auth_status
+                "authStatus": auth_status,
+                "context": context_info
             }
         }
 
@@ -192,10 +246,11 @@ class Catalyst9MCP:
             raise ValueError(f"Unknown tool: {tool_name}")
 
     def search_knowledge(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Search knowledge with user context"""
+        """Search knowledge with user and project context"""
         query = args.get("query", "")
-        scope = args.get("scope", "all")
-        org = args.get("org", None)
+        # Use project context defaults if not specified
+        scope = args.get("scope", self.search_scope)
+        org = args.get("org", self.default_org if self.default_org else None)
         limit = args.get("limit", 10)
 
         # Add user context to search
@@ -204,7 +259,7 @@ class Catalyst9MCP:
             "limit": limit,
             "user": self.user,
             "scope": scope,
-            "org": org
+            "org": org if org else None
         }
 
         response = self.session.post(
@@ -240,15 +295,21 @@ class Catalyst9MCP:
             raise Exception(f"API error: {response.status_code}")
 
     def add_knowledge(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Add knowledge with visibility control"""
+        """Add knowledge with project context defaults"""
         content = args.get("content", "")
-        tags = args.get("tags", [])
-        visibility = args.get("visibility", "private")
-        org = args.get("org", None)
+        # Use project context defaults if not specified
+        tags = args.get("tags", self.default_tags if self.default_tags else [])
+        visibility = args.get("visibility", self.default_visibility)
+        org = args.get("org", self.default_org if self.default_org else None)
+
+        # Merge default tags with provided tags
+        if isinstance(tags, str):
+            tags = [tags]
+        all_tags = list(set(self.default_tags + tags))  # Deduplicate
 
         knowledge_data = {
             "content": content,
-            "tags": tags,
+            "tags": all_tags,
             "user": self.user,
             "visibility": visibility,
             "org": org,
@@ -270,11 +331,15 @@ class Catalyst9MCP:
             else:
                 location = f"{self.user}'s private space"
 
+            context_note = ""
+            if self.project_name:
+                context_note = f"\n[Context: {self.project_name}]"
+
             return {
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Knowledge added to {location}.\nVisibility: {visibility}\nTags: {', '.join(tags) if tags else 'none'}"
+                        "text": f"Knowledge added to {location}.\nVisibility: {visibility}\nTags: {', '.join(all_tags) if all_tags else 'none'}{context_note}"
                     }
                 ]
             }

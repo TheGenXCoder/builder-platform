@@ -30,6 +30,11 @@ models/downloads/
 secrets/
 credentials.json
 
+# C9 Context Configuration
+# Note: .c9rc files are NOT ignored by default (they're project config)
+# If you need personal overrides, use environment variables or add to .gitignore.local
+# .c9rc
+
 # Temporary research files
 **/temp/
 **/.temp/

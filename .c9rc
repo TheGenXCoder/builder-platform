@@ -1,0 +1,20 @@
+# Catalyst9 Project Context Configuration
+# This file is read by the C9 MCP wrapper to determine context
+
+# Organization context (leave empty for personal)
+C9_ORG=catalyst9
+
+# Default visibility for knowledge added in this project
+C9_DEFAULT_VISIBILITY=org
+
+# Default tags to auto-apply
+C9_DEFAULT_TAGS=c9,development,knowledge-graph
+
+# Search scope (personal, org, team, project, all)
+C9_SEARCH_SCOPE=all
+
+# Project identifier
+C9_PROJECT=catalyst-core
+
+# Description
+C9_PROJECT_DESC="Catalyst9 Knowledge Graph System - Core Platform Development"
