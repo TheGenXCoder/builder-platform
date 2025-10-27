@@ -88,9 +88,14 @@ class Catalyst9MCP:
                         },
                         "scope": {
                             "type": "string",
-                            "enum": ["personal", "shared", "all"],
-                            "description": "Search scope",
-                            "default": "personal"
+                            "enum": ["personal", "org", "team", "project", "all"],
+                            "description": "Search scope (personal, org, team, project, or all)",
+                            "default": "all"
+                        },
+                        "org": {
+                            "type": "string",
+                            "description": "Organization to search (e.g., 'uta')",
+                            "default": None
                         },
                         "limit": {
                             "type": "integer",
@@ -116,10 +121,16 @@ class Catalyst9MCP:
                             "items": {"type": "string"},
                             "description": "Tags for categorization"
                         },
-                        "shared": {
-                            "type": "boolean",
-                            "description": "Share with team",
-                            "default": False
+                        "visibility": {
+                            "type": "string",
+                            "enum": ["private", "org", "team", "public"],
+                            "description": "Visibility level",
+                            "default": "private"
+                        },
+                        "org": {
+                            "type": "string",
+                            "description": "Organization slug (e.g., 'uta')",
+                            "default": None
                         }
                     },
                     "required": ["content"]
@@ -183,7 +194,8 @@ class Catalyst9MCP:
     def search_knowledge(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Search knowledge with user context"""
         query = args.get("query", "")
-        scope = args.get("scope", "personal")
+        scope = args.get("scope", "all")
+        org = args.get("org", None)
         limit = args.get("limit", 10)
 
         # Add user context to search
@@ -191,7 +203,8 @@ class Catalyst9MCP:
             "query": query,
             "limit": limit,
             "user": self.user,
-            "scope": scope
+            "scope": scope,
+            "org": org
         }
 
         response = self.session.post(
@@ -201,7 +214,8 @@ class Catalyst9MCP:
 
         if response.status_code == 200:
             data = response.json()
-            result_text = f"Search results for '{query}' (user: {self.user}, scope: {scope}):\n\n"
+            scope_desc = f"{org} org" if org else scope
+            result_text = f"Search results for '{query}' (scope: {scope_desc}):\n\n"
 
             if data.get("results"):
                 for i, result in enumerate(data["results"], 1):
@@ -226,16 +240,18 @@ class Catalyst9MCP:
             raise Exception(f"API error: {response.status_code}")
 
     def add_knowledge(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Add knowledge with user attribution"""
+        """Add knowledge with visibility control"""
         content = args.get("content", "")
         tags = args.get("tags", [])
-        shared = args.get("shared", False)
+        visibility = args.get("visibility", "private")
+        org = args.get("org", None)
 
         knowledge_data = {
             "content": content,
             "tags": tags,
             "user": self.user,
-            "shared": shared,
+            "visibility": visibility,
+            "org": org,
             "timestamp": datetime.utcnow().isoformat()
         }
 
@@ -245,12 +261,20 @@ class Catalyst9MCP:
         )
 
         if response.status_code == 200:
-            visibility = "shared" if shared else "personal"
+            if visibility == "org" and org:
+                location = f"{org} organization"
+            elif visibility == "team":
+                location = "team"
+            elif visibility == "public":
+                location = "public knowledge base"
+            else:
+                location = f"{self.user}'s private space"
+
             return {
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Knowledge added successfully to {self.user}'s {visibility} graph.\nTags: {', '.join(tags) if tags else 'none'}"
+                        "text": f"Knowledge added to {location}.\nVisibility: {visibility}\nTags: {', '.join(tags) if tags else 'none'}"
                     }
                 ]
             }
