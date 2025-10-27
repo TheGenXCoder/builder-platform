@@ -36,3 +36,5 @@ credentials.json
 .credentials/
 projects/neovim-kg-plugin/
 YOUR-API-KEYS.md
+.invites/
+.users/
